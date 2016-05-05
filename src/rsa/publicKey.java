@@ -1,16 +1,31 @@
 package rsa;
 
-public class publicKey
+public class PublicKey
 {
 	private long publicExponent;
 	private long keyProduct;
 	
-	public publicKey(long n, long e)
+	// Constructors
+	// -------------------------------------
+	
+	public PublicKey(long n, long e)
 	{
 		this.publicExponent = e;
 		this.keyProduct = n;
 	}
+	
+	// Overridden methods
+	// -----------------------------------
+	
+	@Override
+	public String toString()
+	{
+		return "Public Key:\n  n = " + keyProduct + "\n  e = " + publicExponent;
+	}
 
+	// Getters and Setters
+	// ------------------------------------
+	
 	public long getPublicExponent()
 	{
 		return publicExponent;

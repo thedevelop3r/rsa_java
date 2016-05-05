@@ -1,5 +1,7 @@
 package rsa;
 
+import rsa.CryptoMath;
+
 public class Keypair
 {
 	private long prime1;
@@ -8,10 +10,30 @@ public class Keypair
 	private long publicExponent;
 	private long privateExponent;
 	private long keyProduct;
-	
+
 	// Constructors
 	// ------------------------------------------------------
-	
+
+	public Keypair(long p, long q, long n, long phi, long e, long d)
+	{
+		this.prime1 = p;
+		this.prime2 = q;
+		this.keyProduct = n;
+		this.keyTotient = phi;
+		this.publicExponent = e;
+		this.privateExponent = d;
+	}
+
+	public Keypair(long p, long q, long n, long e)
+	{
+		this.prime1 = p;
+		this.prime2 = q;
+		this.keyProduct = n;
+		this.publicExponent = e;
+		calcTotient();
+		calcPrivateExponent();
+	}
+
 	public Keypair(long p, long q)
 	{
 		this.prime1 = p;
@@ -21,80 +43,70 @@ public class Keypair
 		calcPublicExponent();
 		calcPrivateExponent();
 	}
-	
+
+	// Overridden methods
+	// ----------------------------------------------------
+
+	public String toString()
+	{
+		return "RSA Public/Private Keypair:\n  p = " + prime1 + "\n  q = " + prime2 + "\n  n = " + keyProduct + "\n  phi = "
+				+ keyTotient + "\n  e = " + publicExponent + "\n  d = " + privateExponent;
+	}
+
 	// Functional methods
 	// --------------------------------------------------------
-	
-	public void calcTotient()
+
+	public long calcTotient()
 	{
-		this.keyTotient = (this.prime1 -1) * (this.prime2 - 1);
+		this.keyTotient = (this.prime1 - 1) * (this.prime2 - 1);
+		return keyTotient;
 	}
-	
-	public void calcPublicExponent()
+
+	public long calcPublicExponent()
 	{
-		for(publicExponent = 2; publicExponent < keyTotient; publicExponent++)
+		for (publicExponent = 2; publicExponent < keyTotient; publicExponent++)
 		{
-			if(gcd(publicExponent, keyTotient) == 1) return;
+			if (CryptoMath.gcd(publicExponent, keyTotient) == 1)
+				return publicExponent;
 		}
+		return -1; // shut up compiler
 	}
-	
-	public void calcPrivateExponent()
+
+	public long calcPrivateExponent()
 	{
 		privateExponent = publicExponent + 1;
-		while((privateExponent * publicExponent - 1) % keyTotient != 0)
+		while ((privateExponent * publicExponent - 1) % keyTotient != 0)
 		{
 			privateExponent++;
 		}
+		return privateExponent;
 	}
-	
+
 	public long encrypt(long value) throws NotInEncryptionRangeException
 	{
-		if(value < keyProduct)
+		if (value < keyProduct)
 		{
-			return modularExponentiation(value, publicExponent, keyProduct);
+			return CryptoMath.modularExponentiation(value, publicExponent, keyProduct);
 		}
 		else
 		{
 			throw new NotInEncryptionRangeException();
 		}
 	}
-	
+
 	public long decrypt(long value)
 	{
-		return modularExponentiation(value, privateExponent, keyProduct);
-	}
-	
-	// Static functional method
-	// ---------------------------------------------------------
-	
-	public static long gcd(long x, long y)
-	{
-		while(x != y)
-		{
-			if (x < y) y -= x;
-			else x -= y;
-		}
-		return x;
-	}
-	
-	public static long modularExponentiation(long a, long b, long c)
-	{
-		long result = 1;
-		for(int i = 1; i <= b; i++)
-		{
-			result = (result * a) % c;
-		}
-		return result;
+		return CryptoMath.modularExponentiation(value, privateExponent, keyProduct);
 	}
 
 	// Getters and Setters
 	// --------------------------------------------------
-	
-	public publicKey getPublicKey()
+
+	public PublicKey getPublicKey()
 	{
-		return new publicKey(keyProduct, publicExponent);
+		return new PublicKey(keyProduct, publicExponent);
 	}
-	
+
 	public long getPrime1()
 	{
 		return prime1;
@@ -154,5 +166,5 @@ public class Keypair
 	{
 		this.keyProduct = keyProduct;
 	}
-	
+
 }
