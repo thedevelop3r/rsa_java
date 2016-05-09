@@ -9,7 +9,7 @@ public class Driver
 		System.out.println("Test encrypt 43:\n  " + key.encrypt(43));
 		System.out.println("Test decrypt 267:\n  " + key.decrypt(key.encrypt(43)));
 		
-		String message = "The correct answer is C";
+		String message = "I like potatoes";
 		
 		System.out.print("Text encrypt message:\n  ");
 		String encrypted = "";

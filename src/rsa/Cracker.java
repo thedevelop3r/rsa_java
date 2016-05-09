@@ -37,7 +37,7 @@ public class Cracker
 			}
 			catch (FileNotFoundException e)
 			{
-				System.out.println("Error Primes File not Found");
+				System.out.println("Error: Primes File not Found");
 			}
 			finally
 			{
